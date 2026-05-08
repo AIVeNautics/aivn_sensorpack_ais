@@ -1,0 +1,45 @@
+ais_serial_node:
+  ros__parameters:
+    # AIS 수신 장치가 연결된 시리얼 포트 경로
+    # 실제 장비 연결 시 /dev/ttyUSB0, /dev/ttyUSB1 또는 /dev/serial/by-id/... 사용
+    ais_serial_port_name: "/dev/ttyUSB0"
+
+    # AIS 장비와 통신할 시리얼 보드레이트
+    # 현장 장비 설정과 반드시 동일해야 함
+    # AIS 수신기는 보통 38400bps를 사용
+    ais_baud_rate: 38400
+
+    # 파싱된 AIS 선박 정보를 퍼블리시할 ROS 2 토픽 이름
+    ais_topic_name: "/edge_server/external/ais/ship"
+
+    # 퍼블리시 메시지의 header.frame_id 값
+    # 좌표계/센서 출처 식별용 문자열
+    ais_frame_id: "ais"
+
+    # 상세 로그 출력 여부
+    # true: 수신/파싱 상태를 더 자세히 출력
+    # false: 일반 운영 모드
+    ais_verbose: false
+
+    # AIS NMEA 문장의 체크섬 검증 필수 여부
+    # true: 체크섬이 없거나 틀린 문장은 폐기
+    # false: 체크섬 오류가 있어도 가능한 범위에서 처리
+    ais_checksum_required: true
+
+    # 시리얼 포트를 주기적으로 읽는 타이머 주기, 단위: 초
+    # 0.005초 = 5ms 주기로 읽기 시도
+    ais_poll_period_sec: 0.005
+
+    # 한 번에 시리얼 포트에서 읽을 최대 바이트 수
+    # AIS 문장이 몰려 들어올 때 버퍼에서 최대 8192바이트까지 읽음
+    ais_read_size: 8192
+
+    # 시리얼 연결 실패 또는 끊김 발생 시 재연결을 시도하는 간격, 단위: 초
+    # 2.0초마다 재연결 시도
+    ais_reconnect_sec: 2.0
+
+    # AIS 정적 정보 캐시 유지 시간, 단위: 초
+    # Type 5/24 등에서 받은 선박명, IMO, Callsign 같은 정적 정보를
+    # 동적 위치 메시지 Type 1/2/3/18/19와 매칭할 때 사용
+    # 600초 = 10분 동안 최신 정적 정보를 유지
+    ais_stale_static_info_sec: 600.0
