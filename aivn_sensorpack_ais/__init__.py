@@ -1,0 +1,1 @@
+"""AIS-only sensorpack package."""
