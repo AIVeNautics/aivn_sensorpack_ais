@@ -10,7 +10,7 @@ def generate_launch_description():
     config_file = PathJoinSubstitution([
         FindPackageShare("aivn_sensorpack_ais"),
         "config",
-        "ais_serial.yaml",
+        "config.yaml",
     ])
 
     ais_serial_port_name = LaunchConfiguration("ais_serial_port_name")
