@@ -1,0 +1,1 @@
+git clone -b exp/260514_BUSAN github_seoulubuntu:AIVeNautics/aivn_sensorpack_ais.git
