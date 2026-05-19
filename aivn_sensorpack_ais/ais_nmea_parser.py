@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import time
-from typing import Dict, Optional, Tuple
+from typing import Callable, Dict, Optional, Tuple
 
 from .ais_sixbit import get_int, get_text, get_uint, payload_to_bits
 
@@ -42,9 +42,15 @@ class _FragmentAssembly:
 
 
 class AisNmeaParser:
-    def __init__(self, checksum_required: bool = True, fragment_ttl_sec: float = 8.0):
+    def __init__(
+        self,
+        checksum_required: bool = True,
+        fragment_ttl_sec: float = 8.0,
+        debug_cb: Optional[Callable[[str], None]] = None,
+    ):
         self.checksum_required = checksum_required
         self.fragment_ttl_sec = fragment_ttl_sec
+        self.debug_cb = debug_cb
         self._fragments: Dict[Tuple[str, str, str], _FragmentAssembly] = {}
 
     def parse_sentence(self, sentence: str) -> Optional[AisDecoded]:
@@ -83,18 +89,35 @@ class AisNmeaParser:
         if assembly is None or assembly.total != total:
             assembly = _FragmentAssembly(total=total)
             self._fragments[key] = assembly
+            self._debug(
+                "fragment assembly started: "
+                f"key={key} total={total} sentence={sentence_id}"
+            )
 
         assembly.payloads[number] = payload
         assembly.sentences[number] = s
+        self._debug(
+            "fragment received: "
+            f"key={key} part={number}/{total} "
+            f"collected={len(assembly.payloads)}/{total}"
+        )
         if number == total:
             assembly.fill_bits = fill_bits
 
         if len(assembly.payloads) != total:
+            self._debug(
+                "fragment assembly waiting: "
+                f"key={key} missing={total - len(assembly.payloads)}"
+            )
             return None
 
         combined_payload = "".join(assembly.payloads[i] for i in range(1, total + 1))
         combined_sentence = "\n".join(assembly.sentences[i] for i in range(1, total + 1))
         del self._fragments[key]
+        self._debug(
+            "fragment assembly completed: "
+            f"key={key} total={total} payload_len={len(combined_payload)}"
+        )
         return self.decode_payload(combined_payload, assembly.fill_bits, combined_sentence)
 
     def decode_payload(self, payload: str, fill_bits: int, original_sentence: str = "") -> Optional[AisDecoded]:
@@ -116,6 +139,7 @@ class AisNmeaParser:
             return self._decode_static_type_5(bits, msg_id, mmsi, ship_id, original_sentence)
         if msg_id == 24:
             return self._decode_static_type_24(bits, msg_id, mmsi, ship_id, original_sentence)
+        self._debug(f"unsupported AIS message type ignored: msg_id={msg_id} mmsi={mmsi}")
         return None
 
     def _decode_position_class_a(
@@ -244,4 +268,9 @@ class AisNmeaParser:
             if now - assembly.first_seen > self.fragment_ttl_sec
         ]
         for key in stale_keys:
+            self._debug(f"fragment assembly expired: key={key}")
             del self._fragments[key]
+
+    def _debug(self, message: str) -> None:
+        if self.debug_cb is not None:
+            self.debug_cb(message)

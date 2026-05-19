@@ -6,7 +6,19 @@ ais_serial_node:
     ais_frame_id: "ais"
     ais_verbose: false
     ais_checksum_required: true
+    ais_data_bits: 8
+    ais_parity: "N"
+    ais_stop_bits: 1
+    ais_xonxoff: false
+    ais_rtscts: false
+    ais_dsrdtr: false
     ais_poll_period_sec: 0.005
     ais_read_size: 8192
     ais_reconnect_sec: 2.0
     ais_stale_static_info_sec: 600.0
+    ais_no_data_warn_sec: 10.0
+    ais_no_nmea_sync_warn_sec: 3.0
+    ais_debug_hex_dump: false #데이터 자체가 오는지 의심될 때 추가
+    ais_debug_hex_limit: 64
+    ais_debug_publish_reason: true #  publish 안 되는 이유를 바로 보여줌
+    ais_debug_fragment: true #type 5/24 같은 fragment 조립 문제 의심될 때 추가
