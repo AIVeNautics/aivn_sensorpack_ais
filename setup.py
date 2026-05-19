@@ -25,6 +25,7 @@ setup(
     entry_points={
         "console_scripts": [
             "ais_serial_node = aivn_sensorpack_ais.ais_serial_node:main",
+            "ais_topic_bridge_node = aivn_sensorpack_ais.ais_topic_bridge_node:main",
         ],
     },
 )

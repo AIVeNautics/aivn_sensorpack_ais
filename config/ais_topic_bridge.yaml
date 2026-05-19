@@ -1,0 +1,14 @@
+ais_topic_bridge_node:
+  ros__parameters:
+    use_sim_time: true
+    input_topic_name: "/sensor_pack/navigation/novatel_isro_p2/w2k_60003"
+    ais_topic_name: "/sensor_pack/external/ais/ship"
+    ais_frame_id: "ais"
+    ais_source_port: "w2k_60003"
+    ais_verbose: false
+    ais_checksum_required: true
+    ais_stale_static_info_sec: 600.0
+    ais_debug_publish_reason: true
+    ais_debug_fragment: true
+    input_queue_size: 100
+    output_queue_size: 100
